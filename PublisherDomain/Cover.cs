@@ -2,9 +2,9 @@
 {
 	public class Cover
 	{
-		public int CoverId { get; set; }
-		public string DesignIdeas { get; set; }
+        public int CoverId { get; set; }
+        public string DesignIdeas { get; set; }
         public bool DigitalOnly { get; set; }
-		public List<Artist> Artists { get; set; } = new();
+        public List<Artist> Artists { get; set; }
     }
 }

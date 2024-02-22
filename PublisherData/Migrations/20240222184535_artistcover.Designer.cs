@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PublisherData;
 
@@ -11,9 +12,11 @@ using PublisherData;
 namespace PublisherData.Migrations
 {
     [DbContext(typeof(PubContext))]
-    partial class PubContextModelSnapshot : ModelSnapshot
+    [Migration("20240222184535_artistcover")]
+    partial class artistcover
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,21 @@ namespace PublisherData.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ArtistCover", b =>
+                {
+                    b.Property<int>("ArtistsArtistId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CoversCoverId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ArtistsArtistId", "CoversCoverId");
+
+                    b.HasIndex("CoversCoverId");
+
+                    b.ToTable("ArtistCover");
+                });
 
             modelBuilder.Entity("PublisherDomain.Artist", b =>
                 {
@@ -112,26 +130,19 @@ namespace PublisherData.Migrations
                     b.ToTable("Covers");
                 });
 
-            modelBuilder.Entity("PublisherDomain.CoverAssignment", b =>
+            modelBuilder.Entity("ArtistCover", b =>
                 {
-                    b.Property<int>("ArtistId")
-                        .HasColumnType("int")
-                        .HasColumnName("ArtistsArtistId");
+                    b.HasOne("PublisherDomain.Artist", null)
+                        .WithMany()
+                        .HasForeignKey("ArtistsArtistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<int>("CoverId")
-                        .HasColumnType("int")
-                        .HasColumnName("CoversCoverId");
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.HasKey("ArtistId", "CoverId");
-
-                    b.HasIndex("CoverId");
-
-                    b.ToTable("ArtistCover", (string)null);
+                    b.HasOne("PublisherDomain.Cover", null)
+                        .WithMany()
+                        .HasForeignKey("CoversCoverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PublisherDomain.Book", b =>
@@ -139,21 +150,6 @@ namespace PublisherData.Migrations
                     b.HasOne("PublisherDomain.Author", null)
                         .WithMany()
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("PublisherDomain.CoverAssignment", b =>
-                {
-                    b.HasOne("PublisherDomain.Artist", null)
-                        .WithMany()
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PublisherDomain.Cover", null)
-                        .WithMany()
-                        .HasForeignKey("CoverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PublisherData.Migrations;
 using PublisherDomain;
-using System.ComponentModel;
 
 namespace PublisherData
 {
@@ -9,12 +9,8 @@ namespace PublisherData
 	{
 		public DbSet<Book> Books { get; set; }
 		public DbSet<Author> Authors { get; set; }
-        public DbSet<Artist> Artists { get; set; }
-        public DbSet<Cover> Covers { get; set; }
-        public PubContext()
-		{
-
-		}
+		public DbSet<Artist> Artists { get; set; }
+		public DbSet<Cover> Covers { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
@@ -30,6 +26,16 @@ namespace PublisherData
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Author>().HasMany<Book>().WithOne();
+
+			modelBuilder.Entity<Artist>().HasMany(a => a.Covers).WithMany(c => c.Artists)
+				.UsingEntity<CoverAssignment>(ca =>
+				{
+					ca.Property(b => b.ArtistId).HasColumnName("ArtistsArtistId");
+					ca.Property(b => b.CoverId).HasColumnName("CoversCoverId");
+					ca.Property(b => b.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+					ca.ToTable("ArtistCover");
+				});
+
 		}
 	}
 }
